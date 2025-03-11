@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}My Watchlists - Stock Market Trend Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Watchlists</h1>
+        <a href="{{ url_for('stocks.create_watchlist') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Create Watchlist
+        </a>
+    </div>
+    
+    {% if watchlists %}
+        <div class="row">
+            {% for watchlist in watchlists %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ watchlist.name }}</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteWatchlistModal{{ watchlist.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if watchlist.stocks.count() > 0 %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Symbol</th>
+                                                <th>Name</th>
+                                                <th>Price</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for watchlist_stock in watchlist.stocks %}
+                                                <tr>
+                                                    <td>{{ watchlist_stock.stock.symbol }}</td>
+                                                    <td>{{ watchlist_stock.stock.name }}</td>
+                                                    <td>
+                                                        {% if stock_data and watchlist_stock.stock.symbol in stock_data %}
+                                                            {% set data = stock_data[watchlist_stock.stock.symbol] %}
+                                                            {% if data.success and data.data %}
+                                                                {% set latest = data.data[-1] %}
+                                                                ${{ "%.2f"|format(latest.Close) }}
+                                                                {% if latest.Close > latest.Open %}
+                                                                    <span class="text-success">
+                                                                        <i class="fas fa-arrow-up"></i>
+                                                                    </span>
+                                                                {% elif latest.Close < latest.Open %}
+                                                                    <span class="text-danger">
+                                                                        <i class="fas fa-arrow-down"></i>
+                                                                    </span>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                N/A
+                                                            {% endif %}
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group btn-group-sm">
+                                                            <a href="{{ url_for('stocks.view_stock', symbol=watchlist_stock.stock.symbol) }}" class="btn btn-primary">
+                                                                <i class="fas fa-chart-line"></i>
+                                                            </a>
+                                                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeStockModal{{ watchlist.id }}{{ watchlist_stock.stock.id }}">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <!-- Remove Stock Modal -->
+                                                        <div class="modal fade" id="removeStockModal{{ watchlist.id }}{{ watchlist_stock.stock.id }}" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Remove Stock</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p>Are you sure you want to remove {{ watchlist_stock.stock.symbol }} from {{ watchlist.name }}?</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                        <form action="{{ url_for('stocks.remove_from_watchlist', watchlist_id=watchlist.id, stock_id=watchlist_stock.stock.id) }}" method="post">
+                                                                            <button type="submit" class="btn btn-danger">Remove</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <p class="mb-3">This watchlist is empty.</p>
+                                    <a href="{{ url_for('main.search') }}" class="btn btn-primary">Add Stocks</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Delete Watchlist Modal -->
+                    <div class="modal fade" id="deleteWatchlistModal{{ watchlist.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Watchlist</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the watchlist "{{ watchlist.name }}"?</p>
+                                    <p class="text-danger">This action cannot be undone.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('stocks.delete_watchlist', watchlist_id=watchlist.id) }}" method="post">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h5 class="card-title mb-3">You don't have any watchlists yet</h5>
+                <p class="card-text mb-4">Create a watchlist to track your favorite stocks and monitor their performance.</p>
+                <a href="{{ url_for('stocks.create_watchlist') }}" class="btn btn-primary btn-lg">Create Your First Watchlist</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

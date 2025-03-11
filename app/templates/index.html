@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Stock Market Trend Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row py-5">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold">Analyze Stock Market Trends</h1>
+            <p class="lead">Make informed investment decisions with our comprehensive stock analysis tools.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-lg px-4 me-md-2">Search Stocks</a>
+                <a href="{{ url_for('stocks.compare_stocks') }}" class="btn btn-outline-secondary btn-lg px-4">Compare Stocks</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='images/stock-chart.svg') }}" class="img-fluid" alt="Stock Chart">
+        </div>
+    </div>
+
+    <!-- Popular Stocks Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="mb-4">Popular Stocks</h2>
+        </div>
+        {% if stock_data %}
+            {% for symbol, data in stock_data.items() %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ data.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ symbol }}</h6>
+                            <p class="card-text fs-4">
+                                ${{ "%.2f"|format(data.price) }}
+                                {% if data.change > 0 %}
+                                    <span class="text-success ms-2">
+                                        <i class="fas fa-arrow-up"></i> ${{ "%.2f"|format(data.change) }}
+                                    </span>
+                                {% elif data.change < 0 %}
+                                    <span class="text-danger ms-2">
+                                        <i class="fas fa-arrow-down"></i> ${{ "%.2f"|format(data.change|abs) }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-secondary ms-2">
+                                        <i class="fas fa-minus"></i> $0.00
+                                    </span>
+                                {% endif %}
+                            </p>
+                            <a href="{{ url_for('stocks.view_stock', symbol=symbol) }}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No stock data available at the moment. Please try again later.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="mb-4">Features</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Real-time Data</h5>
+                    <p class="card-text">Access real-time stock market data and stay updated with the latest trends.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-bar fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Technical Indicators</h5>
+                    <p class="card-text">Analyze stocks using various technical indicators like MACD, RSI, and moving averages.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-robot fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">Predictive Analysis</h5>
+                    <p class="card-text">Get price predictions based on machine learning algorithms and historical data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mt-5 mb-5">
+        <div class="col-12 text-center py-5 bg-light rounded">
+            <h2>Ready to start analyzing?</h2>
+            <p class="lead">Create an account to save your watchlists and get personalized recommendations.</p>
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-lg mt-3">Sign Up Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

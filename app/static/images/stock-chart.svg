@@ -1,0 +1,19 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#f8f9fa"/>
+  <path d="M50,350 L100,300 L150,320 L200,280 L250,260 L300,220 L350,240 L400,180 L450,150 L500,100 L550,50" stroke="#2c7be5" stroke-width="3" fill="none"/>
+  <path d="M50,350 L100,300 L150,320 L200,280 L250,260 L300,220 L350,240 L400,180 L450,150 L500,100 L550,50" stroke="rgba(44, 123, 229, 0.2)" stroke-width="0" fill="rgba(44, 123, 229, 0.1)"/>
+  <line x1="50" y1="350" x2="550" y2="350" stroke="#dee2e6" stroke-width="1"/>
+  <line x1="50" y1="50" x2="50" y2="350" stroke="#dee2e6" stroke-width="1"/>
+  <text x="300" y="380" font-family="Arial" font-size="12" text-anchor="middle" fill="#6c757d">Time</text>
+  <text x="20" y="200" font-family="Arial" font-size="12" text-anchor="middle" transform="rotate(-90, 20, 200)" fill="#6c757d">Price</text>
+  <circle cx="100" cy="300" r="4" fill="#2c7be5"/>
+  <circle cx="150" cy="320" r="4" fill="#2c7be5"/>
+  <circle cx="200" cy="280" r="4" fill="#2c7be5"/>
+  <circle cx="250" cy="260" r="4" fill="#2c7be5"/>
+  <circle cx="300" cy="220" r="4" fill="#2c7be5"/>
+  <circle cx="350" cy="240" r="4" fill="#2c7be5"/>
+  <circle cx="400" cy="180" r="4" fill="#2c7be5"/>
+  <circle cx="450" cy="150" r="4" fill="#2c7be5"/>
+  <circle cx="500" cy="100" r="4" fill="#2c7be5"/>
+  <circle cx="550" cy="50" r="4" fill="#2c7be5"/>
+</svg> 

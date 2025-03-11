@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Stock Market Trend Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <!-- Watchlists Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Watchlists</h5>
+                    <a href="{{ url_for('stocks.watchlist') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if current_user.watchlists.count() > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for watchlist in current_user.watchlists %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ watchlist.name }}</h6>
+                                        <small class="text-muted">{{ watchlist.stocks.count() }} stocks</small>
+                                    </div>
+                                    <a href="{{ url_for('stocks.watchlist', watchlist_id=watchlist.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="mb-3">You don't have any watchlists yet.</p>
+                            <a href="{{ url_for('stocks.create_watchlist') }}" class="btn btn-primary">Create Watchlist</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <p>Your recent activity will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Market Overview -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Market Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">S&P 500</h6>
+                                    <p class="card-text fs-4">4,782.82</p>
+                                    <span class="badge bg-success">+0.57%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Dow Jones</h6>
+                                    <p class="card-text fs-4">38,239.98</p>
+                                    <span class="badge bg-success">+0.35%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Nasdaq</h6>
+                                    <p class="card-text fs-4">15,927.90</p>
+                                    <span class="badge bg-success">+0.81%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recommended Stocks -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recommended Stocks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Apple Inc.</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">AAPL</h6>
+                                    <p class="card-text fs-4">
+                                        $182.52
+                                        <span class="text-success ms-2">
+                                            <i class="fas fa-arrow-up"></i> $1.25
+                                        </span>
+                                    </p>
+                                    <a href="{{ url_for('stocks.view_stock', symbol='AAPL') }}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Microsoft Corporation</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">MSFT</h6>
+                                    <p class="card-text fs-4">
+                                        $417.88
+                                        <span class="text-success ms-2">
+                                            <i class="fas fa-arrow-up"></i> $3.45
+                                        </span>
+                                    </p>
+                                    <a href="{{ url_for('stocks.view_stock', symbol='MSFT') }}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Amazon.com, Inc.</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">AMZN</h6>
+                                    <p class="card-text fs-4">
+                                        $178.75
+                                        <span class="text-success ms-2">
+                                            <i class="fas fa-arrow-up"></i> $2.18
+                                        </span>
+                                    </p>
+                                    <a href="{{ url_for('stocks.view_stock', symbol='AMZN') }}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

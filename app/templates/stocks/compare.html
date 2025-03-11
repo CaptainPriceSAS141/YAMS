@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Compare Stocks - Stock Market Trend Analysis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        height: 500px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Compare Stocks</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Select Stocks to Compare</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('stocks.compare_stocks') }}" method="get">
+                        <div class="mb-3">
+                            <label for="symbols" class="form-label">Stock Symbols (comma-separated)</label>
+                            <input type="text" class="form-control" id="symbols" name="symbols" placeholder="e.g., AAPL,MSFT,GOOGL" value="{{ symbols|join(',') if symbols else '' }}">
+                            <div class="form-text">Enter up to 5 stock symbols separated by commas.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="period" class="form-label">Time Period</label>
+                            <select class="form-select" id="period" name="period">
+                                <option value="1mo" {% if period == '1mo' %}selected{% endif %}>1 Month</option>
+                                <option value="3mo" {% if period == '3mo' %}selected{% endif %}>3 Months</option>
+                                <option value="6mo" {% if period == '6mo' %}selected{% endif %}>6 Months</option>
+                                <option value="1y" {% if period == '1y' or not period %}selected{% endif %}>1 Year</option>
+                                <option value="5y" {% if period == '5y' %}selected{% endif %}>5 Years</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Compare</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if symbols and comparison_chart %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Comparison Chart</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="comparisonChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Performance Comparison</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Company</th>
+                                        <th>Current Price</th>
+                                        <th>Change</th>
+                                        <th>% Change</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for symbol in symbols %}
+                                        {% if stock_data[symbol] and stock_data[symbol].success %}
+                                            {% set data = stock_data[symbol] %}
+                                            {% set latest = data.data[-1] if data.data else {} %}
+                                            <tr>
+                                                <td>{{ symbol }}</td>
+                                                <td>{{ data.info.shortName }}</td>
+                                                <td>${{ "%.2f"|format(latest.Close) }}</td>
+                                                <td class="{% if latest.Close > latest.Open %}text-success{% elif latest.Close < latest.Open %}text-danger{% endif %}">
+                                                    {% if latest.Close > latest.Open %}
+                                                        <i class="fas fa-arrow-up"></i> ${{ "%.2f"|format(latest.Close - latest.Open) }}
+                                                    {% elif latest.Close < latest.Open %}
+                                                        <i class="fas fa-arrow-down"></i> ${{ "%.2f"|format(latest.Open - latest.Close) }}
+                                                    {% else %}
+                                                        <i class="fas fa-minus"></i> $0.00
+                                                    {% endif %}
+                                                </td>
+                                                <td class="{% if latest.Close > latest.Open %}text-success{% elif latest.Close < latest.Open %}text-danger{% endif %}">
+                                                    {% if latest.Close > latest.Open %}
+                                                        <i class="fas fa-arrow-up"></i> {{ "%.2f"|format((latest.Close - latest.Open) / latest.Open * 100) }}%
+                                                    {% elif latest.Close < latest.Open %}
+                                                        <i class="fas fa-arrow-down"></i> {{ "%.2f"|format((latest.Open - latest.Close) / latest.Open * 100) }}%
+                                                    {% else %}
+                                                        <i class="fas fa-minus"></i> 0.00%
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('stocks.view_stock', symbol=symbol) }}" class="btn btn-sm btn-primary">View Details</a>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ symbol }}</td>
+                                                <td colspan="5" class="text-muted">No data available for this stock.</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif symbols %}
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="alert alert-info">
+                    No data available for the selected stocks. Please try different symbols.
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Popular Comparisons</h5>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <a href="{{ url_for('stocks.compare_stocks') }}?symbols=AAPL,MSFT,GOOGL" class="btn btn-outline-primary">Tech Giants (AAPL, MSFT, GOOGL)</a>
+                            <a href="{{ url_for('stocks.compare_stocks') }}?symbols=AMZN,WMT,TGT" class="btn btn-outline-primary">Retail (AMZN, WMT, TGT)</a>
+                            <a href="{{ url_for('stocks.compare_stocks') }}?symbols=JPM,BAC,GS" class="btn btn-outline-primary">Banking (JPM, BAC, GS)</a>
+                            <a href="{{ url_for('stocks.compare_stocks') }}?symbols=TSLA,GM,F" class="btn btn-outline-primary">Auto (TSLA, GM, F)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if symbols and comparison_chart %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const comparisonChart = JSON.parse('{{ comparison_chart|safe }}');
+        Plotly.newPlot('comparisonChart', comparisonChart.data, comparisonChart.layout);
+    });
+</script>
+{% endif %}
+{% endblock %} 

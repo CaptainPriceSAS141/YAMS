@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Stocks - Stock Market Trend Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Search Stocks</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <form action="{{ url_for('main.search') }}" method="get" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Enter stock symbol or company name" value="{{ query or '' }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    
+    {% if results %}
+        {% if results.success %}
+            {% if results.results %}
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Search Results</h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for stock in results.results %}
+                                    <li class="list-group-item search-result">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="mb-1">{{ stock.name }}</h5>
+                                                <p class="mb-1 text-muted">{{ stock.symbol }} | {{ stock.exchange }}</p>
+                                                <small>{{ stock.sector }}</small>
+                                            </div>
+                                            <a href="{{ url_for('stocks.view_stock', symbol=stock.symbol) }}" class="btn btn-primary">View</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+                        <div class="alert alert-info">
+                            No stocks found matching "{{ query }}". Try a different search term.
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="alert alert-danger">
+                        Error: {{ results.error }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% elif query %}
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="alert alert-info">
+                    No stocks found matching "{{ query }}". Try a different search term.
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Popular Searches</h5>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                            <a href="{{ url_for('main.search') }}?q=AAPL" class="btn btn-outline-primary">Apple (AAPL)</a>
+                            <a href="{{ url_for('main.search') }}?q=MSFT" class="btn btn-outline-primary">Microsoft (MSFT)</a>
+                            <a href="{{ url_for('main.search') }}?q=GOOGL" class="btn btn-outline-primary">Google (GOOGL)</a>
+                            <a href="{{ url_for('main.search') }}?q=AMZN" class="btn btn-outline-primary">Amazon (AMZN)</a>
+                            <a href="{{ url_for('main.search') }}?q=TSLA" class="btn btn-outline-primary">Tesla (TSLA)</a>
+                            <a href="{{ url_for('main.search') }}?q=META" class="btn btn-outline-primary">Meta (META)</a>
+                            <a href="{{ url_for('main.search') }}?q=NFLX" class="btn btn-outline-primary">Netflix (NFLX)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
